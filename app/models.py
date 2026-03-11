@@ -4,6 +4,10 @@ from datetime import datetime
 import enum
 import uuid
 
+'''
+SQLAlchemy ORM
+'''
+
 Base = declarative_base()
 
 # Enum for transaction type
