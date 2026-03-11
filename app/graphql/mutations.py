@@ -40,7 +40,7 @@ class Mutation:
                 if quantity < 0 and tx_type_str != "adjustment":
                     raise ValueError("Quantity cannot be negative unless it's an adjustment.")
 
-                # 3. Transaction Type Validasi
+                # 3. Transaction Type Validation
                 valid_types = ["restock", "sale", "adjustment"]
                 if tx_type_str not in valid_types:
                     raise ValueError(f"Invalid transaction_type: {tx_type_str}. Must be one of {valid_types}.")
