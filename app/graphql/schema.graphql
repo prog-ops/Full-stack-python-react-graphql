@@ -1,0 +1,37 @@
+# Main Data Type
+type InventoryItem {
+  itemId: ID!
+  sku: String!
+  name: String!
+  category: String!
+  warehouse: String!
+  quantityOnHand: Int!
+  reorderThreshold: Int!
+  lastUpdated: String!
+  stockStatus: String! # Dihitung secara dinamis oleh resolver (In Stock, Low Stock, Out of Stock)
+}
+
+type ImportSummary {
+  totalRows: Int!
+  acceptedRows: Int!
+  rejectedRows: Int!
+  validationErrors: [String!]!
+}
+
+# Enum for Sorting and Filtering
+enum SortBy { NAME, QUANTITY, LAST_UPDATED }
+enum SortOrder { ASC, DESC }
+
+# Queries (to read data)
+type Query {
+  items(
+    search: String,
+    category: String,
+    warehouse: String,
+    stockStatus: String,
+    sortBy: SortBy,
+    sortOrder: SortOrder,
+    limit: Int = 20,
+    offset: Int = 0
+  ): [InventoryItem!]!
+}
