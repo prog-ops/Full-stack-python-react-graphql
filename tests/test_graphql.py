@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import io
+from datetime import datetime
 
 from main import app
 from app.database import Base, get_db
@@ -88,6 +89,12 @@ def test_stock_status_logic():
 
 # 3. TEST: Import CSV (Mutation) Validation Logic
 def test_import_validation_logic():
+    # Setup test item to allow SKU01 restock validation
+    db = TestingSessionLocal()
+    db.add(InventoryItemDB(sku="SKU01", name="Item Test", category="A", warehouse="W1", quantity_on_hand=0))
+    db.commit()
+    db.close()
+
     # Create CSV file in memory that contains valid and invalid data (negative quantity for restock)
     csv_content = """sku,warehouse,transaction_type,quantity
 SKU01,W1,restock,10
