@@ -16,6 +16,12 @@ class InventoryItem:
     last_updated: str
 
     # Dynamic field for Stock Status
+    # Assumption for Stock Status Logic:
+    # 1. 'Out of Stock' : If quantity_on_hand is 0 or less, the item simply doesn't exist to sell.
+    # 2. 'Low Stock'    : If quantity_on_hand is more than 0 but still below or equal to the reorder threshold. 
+    #                     It's an indicator that we need to restock before it becomes 'Out of Stock'.
+    # 3. 'In Stock'     : If quantity_on_hand is strictly greater than the reorder threshold, 
+    #                     the supply is in a healthy, sufficient state.
     @strawberry.field
     def stock_status(self) -> str:
         if self.quantity_on_hand <= 0:
