@@ -139,3 +139,51 @@ SKU03,W1,invalid_type,5
     errors = result["validationErrors"]
     assert any("Quantity cannot be negative" in err for err in errors)
     assert any("Invalid transaction_type" in err for err in errors)
+
+
+# 4. TEST: Query Features (Pagination, Sorting, Filtering)
+def test_items_query_features():
+    db = TestingSessionLocal()
+    db.add_all([
+        InventoryItemDB(sku="1", name="Alpha", category="C1", warehouse="W1", quantity_on_hand=10, reorder_threshold=5, last_updated=datetime(2023, 1, 1)),
+        InventoryItemDB(sku="2", name="Beta", category="C1", warehouse="W1", quantity_on_hand=0, reorder_threshold=5, last_updated=datetime(2023, 1, 3)),
+        InventoryItemDB(sku="3", name="Gamma", category="C2", warehouse="W2", quantity_on_hand=4, reorder_threshold=5, last_updated=datetime(2023, 1, 2)),
+        InventoryItemDB(sku="4", name="Delta", category="C2", warehouse="W2", quantity_on_hand=20, reorder_threshold=5, last_updated=datetime(2023, 1, 4)),
+    ])
+    db.commit()
+    db.close()
+
+    # Test 1: Limit and Skip (Pagination)
+    query_pagination = """
+    query {
+      items(skip: 1, limit: 2) {
+        sku
+      }
+    }
+    """
+    res = client.post("/graphql", json={"query": query_pagination}).json()
+    assert len(res["data"]["items"]) == 2
+
+    # Test 2: Sort by Last Updated DESC
+    query_sort = """
+    query {
+      items(sortBy: "last_updated", sortDesc: true) {
+        name
+      }
+    }
+    """
+    res = client.post("/graphql", json={"query": query_sort}).json()
+    names = [item["name"] for item in res["data"]["items"]]
+    assert names == ["Delta", "Beta", "Gamma", "Alpha"] # sorted by date DESC
+
+    # Test 3: Filter by Stock Status (Low Stock)
+    query_status = """
+    query {
+      items(stockStatus: "Low Stock") {
+        name
+      }
+    }
+    """
+    res = client.post("/graphql", json={"query": query_status}).json()
+    assert len(res["data"]["items"]) == 1
+    assert res["data"]["items"][0]["name"] == "Gamma"
