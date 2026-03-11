@@ -84,3 +84,51 @@ def test_stock_status_logic():
             assert item["stockStatus"] == "Low Stock"
         elif item["sku"] == "IN01":
             assert item["stockStatus"] == "In Stock"
+
+
+# 3. TEST: Import CSV (Mutation) Validation Logic
+def test_import_validation_logic():
+    # Create CSV file in memory that contains valid and invalid data (negative quantity for restock)
+    csv_content = """sku,warehouse,transaction_type,quantity
+SKU01,W1,restock,10
+SKU02,W1,restock,-5
+SKU03,W1,invalid_type,5
+"""
+    # Prepare payload multipart/form-data for Strawberry GraphQL file upload
+    query = """
+    mutation($file: Upload!) {
+      importTransactions(file: $file) {
+        totalRows
+        acceptedRows
+        rejectedRows
+        validationErrors
+      }
+    }
+    """
+
+    # Change string to bytes
+    csv_bytes = csv_content.encode("utf-8")
+
+    # Strawberry has specific format for file upload via REST/Multipart
+    files = {
+        '0': ('test.csv', io.BytesIO(csv_bytes), 'text/csv')
+    }
+    data = {
+        'operations': '{"query": "mutation($file: Upload!) { importTransactions(file: $file) { totalRows acceptedRows rejectedRows validationErrors } }", "variables": {"file": null}}',
+        'map': '{"0": ["variables.file"]}'
+    }
+
+    response = client.post("/graphql", data=data, files=files)
+    assert response.status_code == 200
+
+    result = response.json()["data"]["importTransactions"]
+
+    # Assertions
+    assert result["totalRows"] == 3
+    assert result["acceptedRows"] == 1  # Only first row is valid
+    assert result["rejectedRows"] == 2
+
+    # Check error message whether it matches the validation
+    errors = result["validationErrors"]
+    assert any("Quantity cannot be negative" in err for err in errors)
+    assert any("Invalid transaction_type" in err for err in errors)
