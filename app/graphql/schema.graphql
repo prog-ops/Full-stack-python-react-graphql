@@ -22,6 +22,8 @@ type ImportSummary {
 enum SortBy { NAME, QUANTITY, LAST_UPDATED }
 enum SortOrder { ASC, DESC }
 
+scalar Upload
+
 # Queries (to read data)
 type Query {
   items(
@@ -29,9 +31,16 @@ type Query {
     category: String,
     warehouse: String,
     stockStatus: String,
-    sortBy: SortBy,
-    sortOrder: SortOrder,
-    limit: Int = 20,
-    offset: Int = 0
+    sortBy: String,
+    sortDesc: Boolean = false,
+    limit: Int = 100,
+    skip: Int = 0
   ): [InventoryItem!]!
+}
+
+# Mutations (Untuk mengubah data / import CSV)
+type Mutation {
+  # Menerima data CSV yang sudah di-parse menjadi array of objects di frontend,
+  # atau menerima file upload langsung (tergantung implementasi yang kita pilih nanti)
+  importTransactions(file: Upload!): ImportSummary!
 }
