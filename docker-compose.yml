@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: fastapi_inventory_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app # sync files for development
+      - /app/.venv # prevent overlapping venvs
+      - db_data:/app # persist sqlite database separately if needed
+    environment:
+      - ENVIRONMENT=production
+    restart: unless-stopped
+
+volumes:
+  db_data:
