@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 import strawberry
 from app.graphql.queries import Query
@@ -21,6 +22,14 @@ graphql_app = GraphQLRouter(schema, context_getter=get_context, multipart_upload
 app = FastAPI(
     title="Inventory API",
     description="Python FastAPI Backend for Inventory with React frontend"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 # Attach the route on endpoint "/graphql"
