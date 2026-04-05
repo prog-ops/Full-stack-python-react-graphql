@@ -1,6 +1,6 @@
 # Enterprise Inventory - React Frontend
 
-This is the frontend component of the Full Stack Developer Technical Assessment, providing a modern, data-heavy Enterprise Inventory Management interface.
+The frontend component to provide a modern, data-heavy Enterprise Inventory Management interface.
 
 ## 1. Setup Instructions
 Ensure you have **Node.js** (v18+) installed.
