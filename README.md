@@ -1,6 +1,6 @@
 # Enterprise Inventory - FastAPI Backend
 
-The backend server to function as an Enterprise Inventory Management System using a highly responsive GraphQL API.
+This is the backend server functioning as an Enterprise Inventory Management System using a highly responsive GraphQL API.
 
 ## 1. Setup Instructions
 Ensure you have Python **3.9+** and `pip` installed.
